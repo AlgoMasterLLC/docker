@@ -1,0 +1,14 @@
+#!/bin/bash
+
+docker compose exec -T site /bin/bash -c "\
+    bash make_style.sh && \
+    uv run manage.py collectstatic --noinput && \
+    uv run manage.py compilemessages && \
+    uv run manage.py compilejsi18n && \
+    cp -r resources/ /assets/ && \
+    rm resources/style.css resources/martor-description.css resources/select2-dmoj.css resources/ace-dmoj.css && \
+    rm resources/dark/style.css resources/dark/martor-description.css resources/dark/select2-dmoj.css resources/dark/ace-dmoj.css && \
+    rm -r sass_processed && \
+    cp 502.html /assets/ && \
+    cp logo.png /assets/ && \
+    cp robots.txt /assets/"

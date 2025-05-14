@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker compose exec -T site uv run manage.py $@

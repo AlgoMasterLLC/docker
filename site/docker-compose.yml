@@ -1,0 +1,67 @@
+services:
+  site:
+    image: AlgoMasterLLC/online-judge
+    env_file: [site.env, aws.env, rds.env, s3.env]
+    restart: unless-stopped
+    environment:
+      - DJANGO_DEBUG=True
+    ports:
+      - 8080:8080
+    volumes:
+      - /mnt/s3:/mnt/s3
+      - /mnt/cdn:/mnt/cdn
+      - $PWD/uwsgi.ini:/etc/uwsgi.ini
+      - $PWD/online-judge:/site
+    build:
+      dockerfile: Dockerfile
+      target: site
+    depends_on: [redis]
+  bridged:
+    image: AlgoMasterLLC/bridged
+    restart: unless-stopped
+    env_file: [site.env, aws.env, rds.env, s3.env]
+    volumes:
+      - $PWD/online-judge:/site
+    ports:
+      - 9999:9999
+    build:
+      dockerfile: Dockerfile
+      target: bridged
+    depends_on: [site]
+  wsevent:
+    image: AlgoMasterLLC/wsevent
+    restart: unless-stopped
+    env_file: [site.env]
+    build:
+      dockerfile: wsevent.Dockerfile
+    volumes:
+      - $PWD/online-judge/websocket:/app/websocket
+    depends_on: [site]
+  proxy:
+    image: nginx
+    restart: unless-stopped
+    depends_on: [site, wsevent]
+    ports:
+      - 80:80
+    volumes:
+      - $PWD/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  # proxy:
+  #   image: AlgoMasterLLC/caddy
+  #   restart: unless-stopped
+  #   build:
+  #     dockerfile: caddy.Dockerfile
+  #   depends_on: [site, wsevent]
+  celery:
+    image: AlgoMasterLLC/celery
+    volumes:
+      - $PWD/online-judge:/site
+    build:
+      dockerfile: Dockerfile
+      target: celery
+  redis:
+    image: redis:8-alpine
+  mariadb:
+    image: mariadb
+    environment:
+      - MARIADB_DATABASE=amoj
+      - MARIADB_ROOT_PASSWORD=amojuwu
