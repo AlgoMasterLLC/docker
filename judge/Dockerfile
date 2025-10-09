@@ -26,7 +26,8 @@ RUN apt-get update && \
 
 RUN if [ "$(arch)" = x86_64 ]; then SCRATCH_ARCH=amd64; else SCRATCH_ARCH=arm64; fi && \
     SCRATCH_VERSION=$(curl -sL "https://api.github.com/repos/VNOI-Admin/scratch-run/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') && \
-    curl -sSL https://github.com/VNOI-Admin/scratch-run/releases/download/${SCRATCH_VERSION}/scratch-run_${SCRATCH_VERSION}_linux_${SCRATCH_ARCH}.zip | bsdtar -xvf- -C /usr/bin
+    curl -sSL https://github.com/VNOI-Admin/scratch-run/releases/download/${SCRATCH_VERSION}/scratch-run_${SCRATCH_VERSION}_linux_${SCRATCH_ARCH}.zip | bsdtar -xvf- -C /usr/bin && \
+    chmod +x /usr/bin/scratch-run
 
 # RUN mkdir /ScratchCLI && cd /ScratchCLI && \
 #     curl -L https://github.com/cuom1999/ScratchCLI/archive/master.tar.gz | tar -xz --strip-components=1 && \
