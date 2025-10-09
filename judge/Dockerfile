@@ -1,17 +1,19 @@
-FROM dmoj/runtimes-tier1
+FROM debian:bullseye-slim
 
 ARG TAG=master
 
-RUN apt-get clean && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends gnupg && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6ED0E7B82643E131 && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 78DBA3BC47EF2265
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl file gcc g++ python3-full python3-pip python3-venv python3-dev python3-setuptools python3-wheel cython3 libseccomp-dev bzip2 gzip \
+    python2 fp-compiler libxtst6 tini ca-certificates-java openjdk-8-jdk-headless openjdk-8-jre-headless gnupg unzip xz-utils libarchive-tools \
+    $([ "$(arch)" = aarch64 ] && echo binutils-arm-linux-gnueabihf) && \
+    mkdir -p /etc/perl && \
+    useradd -m judge
 
 RUN { curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg; } && \
     { echo 'deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main' > /etc/apt/sources.list.d/nodesource.list; } && \
     apt-get update && \
-    apt-get install -y --no-install-recommends unzip xz-utils libarchive-tools nodejs python3-venv python3-pip && \
+    apt-get install -y --no-install-recommends nodejs && \
     if [ "$(arch)" = x86_64 ]; then PYPY_ARCH=linux64; else PYPY_ARCH="$(arch)"; fi && \
     mkdir /opt/pypy2 && curl -L "$(curl https://pypy.org/download.html | grep "/pypy2.*$PYPY_ARCH" | head -n1 | cut -d'"' -f4)" | \
     tar xj -C /opt/pypy2 --strip-components=1 && /opt/pypy2/bin/pypy -mcompileall && \
