@@ -1,19 +1,16 @@
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 ARG TAG=master
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    curl file gcc g++ python3-full python3-pip python3-venv python3-dev python3-setuptools python3-wheel cython3 libseccomp-dev bzip2 gzip \
-    python2 fp-compiler libxtst6 tini ca-certificates-java openjdk-8-jdk-headless openjdk-8-jre-headless gnupg unzip xz-utils libarchive-tools \
-    $([ "$(arch)" = aarch64 ] && echo binutils-arm-linux-gnueabihf) && \
-    mkdir -p /etc/perl && \
-    useradd -m judge
-
-RUN { curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg; } && \
+    apt-get install -y --no-install-recommends curl file libseccomp-dev ca-certificates ca-certificates-java bzip2 gzip gnupg unzip xz-utils libarchive-tools && \
+    { curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg; } && \
     { echo 'deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main' > /etc/apt/sources.list.d/nodesource.list; } && \
     apt-get update && \
-    apt-get install -y --no-install-recommends nodejs && \
+    apt-get install -y --no-install-recommends \
+    nodejs gcc g++ python3-full python3-pip python3-venv python3-dev python3-setuptools python3-wheel cython3 \
+    fp-compiler libxtst6 tini openjdk-17-jdk-headless openjdk-17-jre-headless \
+    $([ "$(arch)" = aarch64 ] && echo binutils-arm-linux-gnueabihf) && \
     if [ "$(arch)" = x86_64 ]; then PYPY_ARCH=linux64; else PYPY_ARCH="$(arch)"; fi && \
     mkdir /opt/pypy2 && curl -L "$(curl https://pypy.org/download.html | grep "/pypy2.*$PYPY_ARCH" | head -n1 | cut -d'"' -f4)" | \
     tar xj -C /opt/pypy2 --strip-components=1 && /opt/pypy2/bin/pypy -mcompileall && \
@@ -22,7 +19,10 @@ RUN { curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg
     mkdir /opt/pypy3 && curl -L "$(curl https://pypy.org/download.html | grep "/pypy3.*$PYPY_ARCH" | head -n1 | cut -d'"' -f4)" | \
     tar xj -C /opt/pypy3 --strip-components=1 && /opt/pypy3/bin/pypy -mcompileall && \
     rm -f /opt/pypy3/bin/python* && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /etc/perl && \
+    useradd -m judge
 
 RUN if [ "$(arch)" = x86_64 ]; then SCRATCH_ARCH=amd64; else SCRATCH_ARCH=arm64; fi && \
     SCRATCH_VERSION=$(curl -sL "https://api.github.com/repos/VNOI-Admin/scratch-run/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') && \
