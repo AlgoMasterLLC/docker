@@ -1,0 +1,34 @@
+#!/bin/bash
+
+FLAGS="-Wall -DONLINE_JUDGE -O2 -fmax-errors=5 -march=native -s"
+
+# Download and precompile testlib.h
+curl -L https://raw.githubusercontent.com/MikeMirzayanov/testlib/master/testlib.h -o /usr/include/testlib.h
+sed -i '/^#include <cstdio>/a#include <cstdint>' /usr/include/testlib.h
+g++ -std=c++20 $FLAGS /usr/include/testlib.h
+
+# Download and precompile testlib_themis_cms.h
+curl -L https://raw.githubusercontent.com/cuom1999/testlib/customized-testlib/testlib_themis_cms.h -o /usr/include/testlib_themis_cms.h
+sed -i '/^#include <cstdio>/a#include <cstdint>' /usr/include/testlib_themis_cms.h
+mkdir -p /usr/include/testlib_themis_cms.h.gch
+g++ -std=c++17 $FLAGS -DTHEMIS /usr/include/testlib_themis_cms.h -o /usr/include/testlib_themis_cms.h.gch/themis
+g++ -std=c++17 $FLAGS -DCMS    /usr/include/testlib_themis_cms.h -o /usr/include/testlib_themis_cms.h.gch/cms
+g++ -std=c++17 $FLAGS          /usr/include/testlib_themis_cms.h -o /usr/include/testlib_themis_cms.h.gch/testlib
+
+# Download and precompile testlib_modified.h
+curl -L https://raw.githubusercontent.com/cuom1999/testlib/customized-testlib/testlib_modified.h -o /usr/include/testlib_modified.h
+sed -i '/^#include <cstdio>/a#include <cstdint>' /usr/include/testlib_modified.h
+g++ -std=c++17 $FLAGS /usr/include/testlib_modified.h
+
+# Precompile bits/stdc++.h
+IFS=$'\n' files=( $(find /usr/include/ -name stdc++.h) );
+for item in "${files[@]}"; {
+  GCH_DIR="$item".gch
+  mkdir -p $GCH_DIR
+  eval "g++ -std=c++03 $FLAGS -o $GCH_DIR/cpp03 $item"
+  eval "g++ -std=c++11 $FLAGS -o $GCH_DIR/cpp11 $item"
+  eval "g++ -std=c++14 $FLAGS -o $GCH_DIR/cpp14 $item"
+  eval "g++ -std=c++17 $FLAGS -o $GCH_DIR/cpp17 $item"
+  eval "g++ -std=c++20 $FLAGS -o $GCH_DIR/cpp20 $item"
+  eval "g++ -std=c++14 -pipe -O2 -s -static -DTHEMIS -o $GCH_DIR/cppthemis $item"
+}
