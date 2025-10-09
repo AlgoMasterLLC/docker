@@ -2,12 +2,12 @@ FROM dmoj/runtimes-tier1
 
 ARG TAG=master
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6ED0E7B82643E131 && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gnupg \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6ED0E7B82643E131 && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 78DBA3BC47EF2265 && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends gnupg
 
-RUN { curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg; } && \
+    RUN { curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg; } && \
     { echo 'deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main' > /etc/apt/sources.list.d/nodesource.list; } && \
     apt-get update && \
     apt-get install -y --no-install-recommends unzip xz-utils libarchive-tools nodejs python3-venv python3-pip && \
