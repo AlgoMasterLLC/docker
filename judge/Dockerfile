@@ -2,7 +2,8 @@ FROM dmoj/runtimes-tier1
 
 ARG TAG=master
 
-RUN apt-get update && \
+RUN apt-get clean && \
+    apt-get update && \
     apt-get install -y --no-install-recommends gnupg && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6ED0E7B82643E131 && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 78DBA3BC47EF2265
