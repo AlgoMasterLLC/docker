@@ -42,7 +42,7 @@ RUN mkdir /judge /problems && cd /judge && \
     runuser -u judge -w PATH -- /env/bin/dmoj-autoconf -V > /judge-runtime-paths.yml && \
     echo '  crt_x86_in_lib32: true' >> /judge-runtime-paths.yml
 
-COPY download_testlib_and_precompile.sh /judge/.docker/download_testlib_and_precompile
+COPY --chmod=755 download_testlib_and_precompile.sh /judge/.docker/download_testlib_and_precompile
 
 RUN /judge/.docker/download_testlib_and_precompile
 
