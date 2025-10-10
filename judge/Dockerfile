@@ -49,4 +49,6 @@ RUN /judge/.docker/download_testlib_and_precompile
 
 RUN groupadd -r user && useradd -r -g user user
 
+ENV PATH="/opt/pypy2/bin:/opt/pypy3/bin:${PATH}"
+
 ENTRYPOINT ["/judge/.docker/entry"]
