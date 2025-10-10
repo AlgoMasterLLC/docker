@@ -29,9 +29,9 @@ RUN if [ "$(arch)" = x86_64 ]; then SCRATCH_ARCH=amd64; else SCRATCH_ARCH=arm64;
     curl -sSL https://github.com/VNOI-Admin/scratch-run/releases/download/${SCRATCH_VERSION}/scratch-run_${SCRATCH_VERSION}_linux_${SCRATCH_ARCH}.zip | bsdtar -xvf- -C /usr/bin && \
     chmod +x /usr/bin/scratch-run
 
-# RUN mkdir /ScratchCLI && cd /ScratchCLI && \
-#     curl -L https://github.com/cuom1999/ScratchCLI/archive/master.tar.gz | tar -xz --strip-components=1 && \
-#     npm i && ln -sf /ScratchCLI/scratch.js /usr/bin/scratch && chmod +x /usr/bin/scratch
+
+ENV PATH="/opt/pypy2/bin:/opt/pypy3/bin:${PATH}"
+
 
 RUN mkdir /judge /problems && cd /judge && \
     curl -L https://github.com/LQDJudge/judge-server/archive/"${TAG}".tar.gz | tar -xz --strip-components=1 && \
@@ -48,7 +48,5 @@ COPY --chmod=755 download_testlib_and_precompile.sh /judge/.docker/download_test
 RUN /judge/.docker/download_testlib_and_precompile
 
 RUN groupadd -r user && useradd -r -g user user
-
-ENV PATH="/opt/pypy2/bin:/opt/pypy3/bin:${PATH}"
 
 ENTRYPOINT ["/judge/.docker/entry"]
