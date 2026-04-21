@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim
 
-ARG TAG=master
+ARG TAG=5306fb654439905011dc846d156e8f473ec88020
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends curl file libseccomp-dev ca-certificates ca-certificates-java bzip2 gzip gnupg unzip xz-utils libarchive-tools && \
@@ -23,6 +23,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /etc/perl && \
     useradd -m judge
+
+RUN mkdir /ScratchCLI && cd /ScratchCLI && \
+    curl -L https://github.com/cuom1999/ScratchCLI/archive/master.tar.gz | tar -xz --strip-components=1
 
 RUN if [ "$(arch)" = x86_64 ]; then SCRATCH_ARCH=amd64; else SCRATCH_ARCH=arm64; fi && \
     SCRATCH_VERSION=$(curl -sL "https://api.github.com/repos/VNOI-Admin/scratch-run/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') && \
