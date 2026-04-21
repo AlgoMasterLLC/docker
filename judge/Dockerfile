@@ -25,7 +25,8 @@ RUN apt-get update && \
     useradd -m judge
 
 RUN mkdir /ScratchCLI && cd /ScratchCLI && \
-    curl -L https://github.com/cuom1999/ScratchCLI/archive/master.tar.gz | tar -xz --strip-components=1
+    curl -L https://github.com/cuom1999/ScratchCLI/archive/master.tar.gz | tar -xz --strip-components=1 && \
+    npm ci
 
 RUN if [ "$(arch)" = x86_64 ]; then SCRATCH_ARCH=amd64; else SCRATCH_ARCH=arm64; fi && \
     SCRATCH_VERSION=$(curl -sL "https://api.github.com/repos/VNOI-Admin/scratch-run/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') && \
@@ -47,6 +48,7 @@ RUN mkdir /judge /problems && cd /judge && \
     echo '  crt_x86_in_lib32: true' >> /judge-runtime-paths.yml
 
 COPY --chmod=755 download_testlib_and_precompile.sh /judge/.docker/download_testlib_and_precompile
+COPY --chmod=755 scratch /ScratchCLI/scratch
 
 RUN /judge/.docker/download_testlib_and_precompile
 
