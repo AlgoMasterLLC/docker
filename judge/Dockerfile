@@ -33,7 +33,7 @@ RUN if [ "$(arch)" = x86_64 ]; then SCRATCH_ARCH=amd64; else SCRATCH_ARCH=arm64;
     chmod +x /usr/bin/scratch-run
 
 
-ENV PATH="/opt/pypy2/bin:/opt/pypy3/bin:${PATH}"
+ENV PATH="/opt/pypy2/bin:/opt/pypy3/bin:/ScratchCLI:${PATH}"
 
 
 RUN mkdir /judge /problems && cd /judge && \
